@@ -40,7 +40,7 @@ namespace Hatchit {
 
         bool SDLWindow::VInitialize()
         {
-            if (SDL_Init(SDL_INIT_TIMER) != 0) {
+            if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0) {
                 HT_DEBUG_PRINTF("SDL Failed to Initialize. Exiting\n");
                 return false;
             }
