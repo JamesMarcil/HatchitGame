@@ -18,6 +18,7 @@
 #include <ht_input_singleton.h>
 #include <ht_sdlkeyboard.h>
 #include <ht_sdlmouse.h>
+#include <ht_sdlgamecontroller.h>
 #include <ht_renderer_singleton.h>
 #include <ht_os.h>
 
@@ -128,7 +129,36 @@ namespace Hatchit {
                 {
                     static_cast<SDLMouse*>(Input::Mouse())->RegisterMouseMove(event.motion.x, event.motion.y);
                 } break;
-
+                case SDL_CONTROLLERAXISMOTION:
+                {
+                    static_cast<SDLGameController*>(Input::Controller())->AxisMotion(event.caxis.which, static_cast<SDL_GameControllerAxis>(event.caxis.axis), event.caxis.value);
+                    break;
+                }
+                case SDL_CONTROLLERBUTTONDOWN:
+                {
+                    static_cast<SDLGameController*>(Input::Controller())->ButtonPressed(event.cbutton.which, static_cast<SDL_GameControllerButton>(event.cbutton.button));
+                    break;
+                }
+                case SDL_CONTROLLERBUTTONUP:
+                {
+                    static_cast<SDLGameController*>(Input::Controller())->ButtonReleased(event.cbutton.which, static_cast<SDL_GameControllerButton>(event.cbutton.button));
+                    break;
+                }
+                case SDL_CONTROLLERDEVICEADDED:
+                {
+                    static_cast<SDLGameController*>(Input::Controller())->AttachController(event.cdevice.which);
+                    break;
+                }
+                case SDL_CONTROLLERDEVICEREMOVED:
+                {
+                    static_cast<SDLGameController*>(Input::Controller())->DetachController(event.cdevice.which);
+                    break;
+                }
+                case SDL_CONTROLLERDEVICEREMAPPED:
+                {
+                    HT_DEBUG_PRINTF("[SDL INPUT] SDL_CONTROLLERDEVICEREMAPPED unimplemented!");
+                    break;
+                }
                 case SDL_WINDOWEVENT:
                 {
                     switch (event.window.event)

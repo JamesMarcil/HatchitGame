@@ -68,14 +68,13 @@ namespace Hatchit
             IController& operator=(const IController& rhs) = default;
             IController& operator=(IController&& rhs) = default;
 
-            virtual bool    VButtonHeld(ControllerSlot slot, Buttons button) = 0;
-            virtual bool    VButtonPressed(ControllerSlot slot, Buttons button) = 0;
-            virtual bool    VButtonReleased(ControllerSlot slot, Buttons button) = 0;
-            virtual float   VAxisValue(ControllerSlot slot, Axis axis) = 0;
-            virtual float   VGetAxisDeadzone(ControllerSlot slot, Axis axis) = 0;
-            virtual void    VSetAxisDeadzone(ControllerSlot slot, Axis axis, float deadzone) = 0;
-        protected:
-        private:
+            virtual void VInitialize(void) = 0;
+            virtual void VDeInitialize(void) = 0;
+            virtual void VUpdate(void) = 0;
+            virtual bool VButtonHeld(ControllerSlot slot, Buttons button) = 0;
+            virtual bool VButtonPressed(ControllerSlot slot, Buttons button) = 0;
+            virtual bool VButtonReleased(ControllerSlot slot, Buttons button) = 0;
+            virtual std::int16_t VAxisValue(ControllerSlot slot, Axis axis) = 0;
         };
     }
 }

@@ -18,6 +18,7 @@
 #include <ht_singleton.h>
 #include <ht_keyboard.h>
 #include <ht_mouse.h>
+#include <ht_controller.h>
 
 namespace Hatchit
 {
@@ -46,15 +47,21 @@ namespace Hatchit
             static bool MouseButtonSinglePress(MouseButton button);
             static bool MouseButtonRelease(MouseButton button);
 
+            /*Controller*/
+            bool ButtonHeld(IController::ControllerSlot slot, IController::Buttons button);
+            bool ButtonPressed(IController::ControllerSlot slot, IController::Buttons button);
+            bool ButtonReleased(IController::ControllerSlot slot, IController::Buttons button);
+            std::int16_t AxisValue(IController::ControllerSlot slot, IController::Axis axis);
 
             static void Update();
 
             static IKeyboard* const Keyboard();
             static IMouse*    const Mouse();
-            
+            static IController* const Controller(void);
         private:
             IKeyboard* m_keyboard;
             IMouse*    m_mouse;
+            IController* m_controller;
         };
     }
 }

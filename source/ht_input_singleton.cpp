@@ -19,10 +19,12 @@
         #define SDL_SUPPORT TRUE
         #include <ht_sdlkeyboard.h>
         #include <ht_sdlmouse.h>
+        #include <ht_sdlgamecontroller.h>
     #endif
 #else
         #include <ht_sdlkeyboard.h>
         #include <ht_sdlmouse.h>
+        #include <ht_sdlgamecontroller.h>
 #endif
 
 namespace Hatchit
@@ -34,7 +36,11 @@ namespace Hatchit
             Input& _instance = Input::instance();
 
             _instance.m_keyboard = new SDLKeyboard;
+
             _instance.m_mouse = new SDLMouse;
+
+            _instance.m_controller = new SDLGameController;
+            _instance.m_controller->VInitialize();
         }
 
         void Input::DeInitialize()
@@ -42,6 +48,11 @@ namespace Hatchit
             Input& _instance = Input::instance();
 
             delete _instance.m_keyboard;
+
+            delete _instance.m_mouse;
+
+            _instance.m_controller->VDeInitialize();
+            delete _instance.m_controller;
         }
 
         bool Input::KeyPressed(IKeyboard::Key key)
@@ -128,6 +139,30 @@ namespace Hatchit
             return _instance.m_mouse->VSingleButtonPress(button);
         }
 
+        bool Input::ButtonHeld(IController::ControllerSlot slot, IController::Buttons button)
+        {
+            Input& _instance = Input::instance();
+            return _instance.m_controller->VButtonHeld(slot, button);
+        }
+
+        bool Input::ButtonPressed(IController::ControllerSlot slot, IController::Buttons button)
+        {
+            Input& _instance = Input::instance();
+            return _instance.m_controller->VButtonPressed(slot, button);
+        }
+
+        bool Input::ButtonReleased(IController::ControllerSlot slot, IController::Buttons button)
+        {
+            Input& _instance = Input::instance();
+            return _instance.m_controller->VButtonReleased(slot, button);
+        }
+
+        std::int16_t Input::AxisValue(IController::ControllerSlot slot, IController::Axis axis)
+        {
+            Input& _instance = Input::instance();
+            return _instance.m_controller->VAxisValue(slot, axis);
+        }
+
         IKeyboard* const Input::Keyboard()
         {
             return Input::instance().m_keyboard;
@@ -138,12 +173,18 @@ namespace Hatchit
             return Input::instance().m_mouse;
         }
 
+        IController* const Input::Controller(void)
+        {
+            return Input::instance().m_controller;
+        }
+
         void Input::Update()
         {
             Input& _instance = Input::instance();
 
             _instance.m_keyboard->VUpdate();
             _instance.m_mouse->VUpdate();
+            _instance.m_controller->VUpdate();
         }
 
     }

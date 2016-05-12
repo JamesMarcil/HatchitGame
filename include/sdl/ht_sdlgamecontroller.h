@@ -16,11 +16,19 @@
 
 #include <ht_platform.h>
 #include <ht_controller.h>
+#include <ht_sdl.h>
+
+#include <stack>
+#include <bitset>
+#include <unordered_map>
+#include <cstdint>
 
 namespace Hatchit {
     namespace Game {
         class HT_API SDLGameController : public IController
         {
+            using ControllerButtonState = std::bitset<SDL_CONTROLLER_BUTTON_MAX>;
+            using ControllerAxisState = std::unordered_map<SDL_GameControllerAxis, std::int16_t>;
         public:
             SDLGameController(void) = default;
             virtual ~SDLGameController(void) = default;
@@ -29,14 +37,32 @@ namespace Hatchit {
             SDLGameController& operator=(const SDLGameController& rhs) = default;
             SDLGameController& operator=(SDLGameController&& rhs) = default;
 
+            bool AttachController(int joystickDeviceIndex);
+            bool DetachController(SDL_JoystickID joystickInstanceId);
+            bool IsControllerAttached(IController::ControllerSlot slot);
+
+            void ButtonPressed(SDL_JoystickID joystickInstanceId, SDL_GameControllerButton button);
+            void ButtonReleased(SDL_JoystickID joystickInstanceId, SDL_GameControllerButton button);
+
+            void AxisMotion(SDL_JoystickID joystickInstanceId, SDL_GameControllerAxis axis, std::int16_t value);
+
+            SDL_GameControllerButton ConvertButtonFromHatchitToSDL(IController::Buttons button);
+            SDL_GameControllerAxis ConvertAxisFromHatchitToSDL(IController::Axis axis);
+
+            virtual void VInitialize(void) override;
+            virtual void VDeInitialize(void) override;
+            virtual void VUpdate(void) override;
             virtual bool VButtonHeld(IController::ControllerSlot slot, IController::Buttons button) override;
             virtual bool VButtonPressed(IController::ControllerSlot slot, IController::Buttons button) override;
             virtual bool VButtonReleased(IController::ControllerSlot slot, IController::Buttons button) override;
-            virtual float VAxisValue(IController::ControllerSlot slot, IController::Axis axis) override;
-            virtual float VGetAxisDeadzone(IController::ControllerSlot slot, IController::Axis axis) override;
-            virtual void VSetAxisDeadzone(IController::ControllerSlot slot, IController::Axis axis, float deadzone) override;
-        protected:
+            virtual std::int16_t VAxisValue(IController::ControllerSlot slot, IController::Axis axis) override;
         private:
+            std::stack<IController::ControllerSlot> m_freeControllerSlots;
+            std::unordered_map<SDL_JoystickID, IController::ControllerSlot> m_idToControllerSlot;
+            std::unordered_map<IController::ControllerSlot, SDL_GameController*> m_connectedGamepads;
+            std::unordered_map<IController::ControllerSlot, ControllerButtonState> m_currentButtonState;
+            std::unordered_map<IController::ControllerSlot, ControllerButtonState> m_previousButtonState;
+            std::unordered_map<IController::ControllerSlot, ControllerAxisState> m_currentAxisState;
         };
     }
 }
