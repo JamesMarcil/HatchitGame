@@ -30,6 +30,8 @@ namespace Hatchit {
             using ControllerButtonState = std::bitset<SDL_CONTROLLER_BUTTON_MAX>;
             using ControllerAxisState = std::unordered_map<SDL_GameControllerAxis, std::int16_t>;
         public:
+            static const std::string XBOX_SDL_MAPPING;
+
             SDLGameController(void) = default;
             virtual ~SDLGameController(void) = default;
             SDLGameController(const SDLGameController& rhs) = default;
@@ -43,6 +45,8 @@ namespace Hatchit {
 
             void ButtonPressed(SDL_JoystickID joystickInstanceId, SDL_GameControllerButton button);
             void ButtonReleased(SDL_JoystickID joystickInstanceId, SDL_GameControllerButton button);
+
+            void JoyHatMotion(SDL_JoystickID joystickInstanceId, std::uint8_t value);
 
             void AxisMotion(SDL_JoystickID joystickInstanceId, SDL_GameControllerAxis axis, std::int16_t value);
 

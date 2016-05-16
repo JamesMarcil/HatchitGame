@@ -19,6 +19,8 @@ namespace Hatchit
 {
     namespace Game
     {
+        const std::string SDLGameController::XBOX_SDL_MAPPING = "4d6963726f736f66742050432d6a6f79,Microsoft PC-joy,a:b0,b:b1,back:b9,dpdown:dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b6,leftshoulder:b4,leftstick:b8,lefttrigger:a2,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b9,righttrigger:a5,rightx:a3,righty:a4,start:b7,x:b2,y:b3,";
+
         bool SDLGameController::AttachController(int joystickDeviceIndex)
         {
             // Validate that the joystick at the provided index is a controller.
@@ -99,6 +101,80 @@ namespace Hatchit
             state.reset(button);
         }
 
+        void SDLGameController::JoyHatMotion(SDL_JoystickID joystickInstanceId, std::uint8_t value)
+        {
+            IController::ControllerSlot slot = m_idToControllerSlot[joystickInstanceId];
+            ControllerButtonState& state = m_currentButtonState[slot];
+
+            switch (value)
+            {
+                case SDL_HAT_CENTERED:
+                {
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_UP);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+                    break;
+                }
+                case SDL_HAT_LEFT:
+                {
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_UP);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+                    break;
+                }
+                case SDL_HAT_LEFTDOWN:
+                {
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_UP);
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+                    break;
+                }
+                case SDL_HAT_LEFTUP:
+                {
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_UP);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+                    break;
+                }
+                case SDL_HAT_UP:
+                {
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_UP);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+                    break;
+                }
+                case SDL_HAT_RIGHT:
+                {
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_UP);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+                    break;
+                }
+                case SDL_HAT_RIGHTUP:
+                {
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_UP);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+                    break;
+                }
+                case SDL_HAT_RIGHTDOWN:
+                {
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_UP);
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+                    state.reset(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+                    state.set(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+                    break;
+                }
+            }
+        }
+
         void SDLGameController::AxisMotion(SDL_JoystickID id, SDL_GameControllerAxis axis, std::int16_t value)
         {
             IController::ControllerSlot slot = m_idToControllerSlot[id];
@@ -166,6 +242,9 @@ namespace Hatchit
 
         void SDLGameController::VInitialize(void)
         {
+            // Setup SDL controller mapping.
+            SDL_GameControllerAddMapping(SDLGameController::XBOX_SDL_MAPPING.c_str());
+
             // Push onto the stack in reverse order.
             m_freeControllerSlots.push(IController::ControllerSlot::FOUR);
             m_freeControllerSlots.push(IController::ControllerSlot::THREE);

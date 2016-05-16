@@ -144,19 +144,21 @@ namespace Hatchit {
                     static_cast<SDLGameController*>(Input::Controller())->ButtonReleased(event.cbutton.which, static_cast<SDL_GameControllerButton>(event.cbutton.button));
                     break;
                 }
+                case SDL_JOYDEVICEADDED:
                 case SDL_CONTROLLERDEVICEADDED:
                 {
                     static_cast<SDLGameController*>(Input::Controller())->AttachController(event.cdevice.which);
                     break;
                 }
+                case SDL_JOYDEVICEREMOVED:
                 case SDL_CONTROLLERDEVICEREMOVED:
                 {
                     static_cast<SDLGameController*>(Input::Controller())->DetachController(event.cdevice.which);
                     break;
                 }
-                case SDL_CONTROLLERDEVICEREMAPPED:
+                case SDL_JOYHATMOTION:
                 {
-                    HT_DEBUG_PRINTF("[SDL INPUT] SDL_CONTROLLERDEVICEREMAPPED unimplemented!");
+                    static_cast<SDLGameController*>(Input::Controller())->JoyHatMotion(event.jhat.which, event.jhat.value);
                     break;
                 }
                 case SDL_WINDOWEVENT:
